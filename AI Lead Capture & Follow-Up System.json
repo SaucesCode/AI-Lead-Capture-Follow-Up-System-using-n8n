@@ -1,0 +1,1165 @@
+{
+  "name": "AI Lead Capture & Follow-Up System",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -464,
+        128
+      ],
+      "id": "95139e10-2180-4401-8159-c8f8b061a38c",
+      "name": "Webhook",
+      "webhookId": "9541e5fe-353c-4417-954a-f7914597b8f5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        16
+      ],
+      "id": "e244604c-b85d-41c4-b78b-71670ed5451f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "086c3a9d-75d5-4b2e-94ab-694b33f2ef5f",
+              "name": "body.name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "205a7197-831d-4893-91f8-f3f9f457e5ca",
+              "name": "body.email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "8c389545-770e-431f-b0cc-e76be5918068",
+              "name": "body.message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        128
+      ],
+      "id": "274006ba-484a-4ca0-8125-05ff75f9b8fc",
+      "name": "Get the Lead"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        432,
+        240
+      ],
+      "id": "e64cf54d-334c-479e-b33d-896bbf6f20a8",
+      "name": "Google Gemini Chat",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HDNEWVaTAHIaRzxP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "This tool stores lead data in a Google Sheet. It expects the following fields: Name, Email, Message, Summary, Category, Score, Date",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "12o2gN9mtwDb3Fr3gyykrS0pbdbtwOPfn-ayZr67uGZg",
+          "mode": "list",
+          "cachedResultName": "Lead Capture Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12o2gN9mtwDb3Fr3gyykrS0pbdbtwOPfn-ayZr67uGZg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12o2gN9mtwDb3Fr3gyykrS0pbdbtwOPfn-ayZr67uGZg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Get the Lead').item.json.body.name }}",
+            "Email": "={{ $('Get the Lead').item.json.body.email }}",
+            "Message": "={{ $('Get the Lead').item.json.body.message }}",
+            "Summary": "={{ $fromAI('Summary', ``, 'string') }}",
+            "Score": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Score', ``, 'string') }}",
+            "Date": "={{ new Date().toLocaleString('en-US', { \n  timeZone: 'Asia/Manila', \n  month: 'long', \n  day: 'numeric', \n  year: 'numeric', \n  hour: 'numeric', \n  minute: 'numeric', \n  hour12: true \n}) }}",
+            "Category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Category', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reply Summary",
+              "displayName": "Reply Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Interest",
+              "displayName": "Interest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        240
+      ],
+      "id": "362f16ef-b6d6-4d42-b198-3a539653b7c8",
+      "name": "store_lead_in_sheet",
+      "notesInFlow": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "araJqhETe5WSbFDG",
+          "name": "Google Sheets patricck"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "This tool sends a thank-you email to the lead’s email address. It expects: recipient email, subject, and message body.",
+        "sendTo": "={{ $('Get the Lead').item.json.body.email }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        688,
+        240
+      ],
+      "id": "df23ce3e-e71f-495a-8151-8f6313b6737a",
+      "name": "send_thank_you_email",
+      "webhookId": "f0112594-b8d1-4062-82e1-fd0817b7c42c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aRsCT5IwpLKOT8z2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -240,
+        128
+      ],
+      "id": "63b1e2dc-aad9-4ee1-ab8d-3906d1d59534",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36ba590c-8fc4-4222-af9a-86e8c21ae202",
+              "name": "prompt",
+              "value": "=You are a Lead Assistant AI.\n\nFollow this flow exactly:\n\n1) Summarize (1–2 sentences)\n- Summarize the lead’s message in plain English.\n- If the message is vague, say what details are missing (scope, timeline, budget, etc.).\n\n2) Score (1–10)\n- Be conservative.\n  1–3 = very low intent (vague, no clear ask)\n  4–6 = moderate intent (some details, unclear start date)\n  7–8 = high intent (specific ask, likely ready)\n  9–10 = very high intent (explicit urgency, timeline, or budget)\n\n3) Categorize\n- Choose one category:\n  - New Leads\n  - Warm Leads\n  - Hot Leads\n  - Clients\n  - Follow Up\n  - Marketing\n  - Spam/Ignore\n\nRules for categorization:\n- If it’s a new inquiry with no context: \"New Leads\"\n- If they showed interest but no urgency: \"Warm Leads\"\n- If they are ready to buy, asking for quotes, or urgent: \"Hot Leads\"\n- If they are already a paying customer: \"Clients\"\n- If you need to reply or they asked a question: \"Follow Up\"\n- If this is a campaign, ad response, or promo: \"Marketing\"\n- If it’s clearly irrelevant or spam: \"Spam/Ignore\"\n\n4) Store Lead\n- Call tool `store_lead_in_sheet` with Name, Email, Message, Summary, Score, Category, Date.\n\n5) Compose Thank-You Email (Subject + Message)\n- Always greet by first name. Keep email under 140 words.\n- Follow your previous logic by score (low, moderate, high, very high).\n\n6) Send Email\n- Call tool `send_thank_you_email` with Subject and Message.\n\nOutput\nReturn ONLY this JSON:\n{\n  \"summary\": \"<1–2 sentence summary>\",\n  \"score\": <integer>,\n  \"category\": \"<one of the categories>\"\n}\n\nRules\n- Do NOT invent budgets or timelines if not stated.\n- Keep Subject <60 chars.\n- Use exact tool names.\n- Lead info:\n  Name: {{ $json.body.name }}\n  Email: {{ $json.body.email }}\n  Message: {{ $json.body.message }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        128
+      ],
+      "id": "5911a968-a211-4a83-bf09-fd14556d903f",
+      "name": "Prompt"
+    },
+    {
+      "parameters": {
+        "chatId": "1884283193",
+        "text": "=📢 New Lead Added!\nName: {{ $('Get the Lead').item.json.body.name }}\nEmail: {{ $('Get the Lead').item.json.body.email }}\nAdded on: {{ new Date().toLocaleString('en-US', { \n  timeZone: 'Asia/Manila', \n  month: 'long', \n  day: 'numeric', \n  year: 'numeric', \n  hour: 'numeric', \n  minute: 'numeric', \n  hour12: true \n}) }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        128
+      ],
+      "id": "762cc978-44e3-4d7b-90e5-c6f2bc4dcff7",
+      "name": "New Lead Alert",
+      "webhookId": "57f641fa-87ef-4e12-8fe9-be5a4ca9f080",
+      "credentials": {
+        "telegramApi": {
+          "id": "rkW1ytppxgI53GN7",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const email = item.json;\n  return {\n    json: {\n      subject: email.subject,\n      from: email.from.text,\n      body: email.text || email.html\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        560
+      ],
+      "id": "ba0a294a-7883-4f81-b092-72afc58ea16b",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "73a2934d-382f-4dcc-8b60-50abe09a2f04",
+              "name": "prompt",
+              "value": "=You are a Lead Response Assistant AI.\n\nFollow this flow exactly:\n\n1) Summarize (1–2 sentences)\n- Summarize the lead’s reply in plain English.\n- If the reply is vague, explicitly say it is vague and what’s missing (intent, timeline, budget, availability, etc.).\n\n2) Categorize Interest\n- Classify interest level based only on their reply:\n  • Low = Vague, non-committal, not ready to move forward.  \n  • Medium = Some engagement, but no urgency or commitment.  \n  • High = Strong interest, clear intent, ready to discuss details.\n\n3) Update Lead\n- Use `update_lead_in_sheet` to update these fields in the lead’s row:\n  - Reply Summary\n  - Interest Level\n  - Responded = TRUE\n\n4) Compose Follow-Up Email (Subject + Message)\n- Always greet the lead by first name (if not possible, use full Name).\n- Make message short, polite, and aligned with their interest level:\n  • Low Interest: Thank them and gently ask if they’d like to proceed or share more details.  \n  • Medium Interest: Acknowledge their response and invite them to a call or share details.  \n  • High Interest: Express readiness to start and propose a quick call to finalize details.  \n\nExamples:\n- Low Interest Subject: \"Would you like to explore this further?\"\n  Message: \"Hi {FirstName}, thanks for your reply! Let me know if you’d like to share more details or revisit this later. I’d be happy to help when the time is right.\"\n- Medium Interest Subject: \"Next steps for your project\"\n  Message: \"Hi {FirstName}, thanks for sharing more details. Let’s confirm your goals and next steps. Would you be open to a quick call or sharing your preferred timeline?\"\n- High Interest Subject: \"We can start planning right away\"\n  Message: \"Hi {FirstName}, your reply shows you’re ready to move forward. Let’s align on scope and start dates. Please send two times that work for a quick call this week.\"\n\n5) Send Email\n- Call `send_followup_email` with Subject and Message.\n\nOutput\n- Return ONLY this JSON object:\n{\n  \"summary\": \"<1–2 sentence summary of reply>\",\n  \"interest\": \"Low|Medium|High\"\n}\n\nRules:\n- Do not invent budgets, timelines, or urgency if not mentioned.\n- Subject must be under 60 characters, Message under 120 words.\n- Tone: friendly, professional, no markdown formatting.\n- Expose these fields for downstream nodes: Summary, Interest, Subject, Message.\n- Lead info source:\n  Name: {{ $json.from || $json.sender || $json.email }}\n  Email: {{ $json.from || $json.sender || $json.email }}\n  Reply: {{ $json.text || $json.html || $json.body }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        560
+      ],
+      "id": "18ee53ff-035b-4bc4-b054-9c373d47a093",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        272,
+        448
+      ],
+      "id": "c5f8a280-44c5-4654-8a30-1039a7e3786a",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        672
+      ],
+      "id": "3722e16d-cc34-4f67-ae8d-8750a7407002",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HDNEWVaTAHIaRzxP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        672
+      ],
+      "id": "0387cfb2-3a1e-4fa2-8eb4-3348c400eab0",
+      "name": "send_followup_email",
+      "webhookId": "f32e5872-5a4f-4036-9c9c-ffda8e22e649",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aRsCT5IwpLKOT8z2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "12o2gN9mtwDb3Fr3gyykrS0pbdbtwOPfn-ayZr67uGZg",
+          "mode": "list",
+          "cachedResultName": "Lead Capture Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12o2gN9mtwDb3Fr3gyykrS0pbdbtwOPfn-ayZr67uGZg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12o2gN9mtwDb3Fr3gyykrS0pbdbtwOPfn-ayZr67uGZg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email__using_to_match_', ``, 'string') }}",
+            "Interest": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Interest', ``, 'string') }}",
+            "Reply Summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Reply_Summary', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Reply Summary",
+              "displayName": "Reply Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interest",
+              "displayName": "Interest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        672
+      ],
+      "id": "72f3593a-e6f8-4239-bb99-87c3b99b63c9",
+      "name": "update_lead_status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "araJqhETe5WSbFDG",
+          "name": "Google Sheets patricck"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.text || $json.html }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "New Leads",
+              "description": "First-time contacts or submissions. These are brand-new signups, contact form messages, or anyone reaching out for the first time."
+            },
+            {
+              "category": "Warm Leads",
+              "description": "People showing interest. They may have replied, asked questions, or engaged with content (like clicking links)."
+            },
+            {
+              "category": "Hot Leads",
+              "description": "Leads who are ready to buy or convert. They’re asking for pricing, demos, next steps, or expressing urgency."
+            },
+            {
+              "category": "Clients",
+              "description": "Confirmed customers or signed deals. All onboarding or client-related communication goes here."
+            },
+            {
+              "category": "Follow Up",
+              "description": "Emails you need to reply to or take action on. Includes pending conversations or reminders."
+            },
+            {
+              "category": "Marketing",
+              "description": "Newsletters, marketing campaigns, promotions, or advertising-related responses."
+            },
+            {
+              "category": "Spam/Ignore",
+              "description": "Obvious spam, junk mail, or low-quality leads that don’t require a response."
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "Please classify the text provided by the user into one of the following categories: {categories}, and use the provided formatting instructions below. Don't explain, and only output the json."
+        }
+      },
+      "id": "14178257-63b8-4d71-b705-57cf0223b843",
+      "name": "Classification Agent",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "position": [
+        1440,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "e65b4ae1-6f5b-4f76-a2f3-402eb86822e9",
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        1520,
+        496
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HDNEWVaTAHIaRzxP",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_7920518482744970576"
+        ]
+      },
+      "id": "9b45a397-c6b0-4e24-9d3b-69519624bb85",
+      "name": "Add Label (New Leads)",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1792,
+        -464
+      ],
+      "webhookId": "4e089f5f-58ea-4c8d-8870-3d155a81f0b7",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aRsCT5IwpLKOT8z2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_4939612610749221643"
+        ]
+      },
+      "id": "49ac501e-21a0-4924-b702-8d28db5a671b",
+      "name": "Add Label (Warm Leads)",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1792,
+        -272
+      ],
+      "webhookId": "4e089f5f-58ea-4c8d-8870-3d155a81f0b7",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aRsCT5IwpLKOT8z2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_3393573287025653480"
+        ]
+      },
+      "id": "3e56078e-01b5-4c10-b7d2-9d173450d200",
+      "name": "Add Label (Clients)",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1792,
+        -80
+      ],
+      "webhookId": "4e089f5f-58ea-4c8d-8870-3d155a81f0b7",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aRsCT5IwpLKOT8z2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_9024293457547192420"
+        ]
+      },
+      "id": "16538a4a-d4fa-4c6e-be7c-23df07c75204",
+      "name": "Add Label (Follow Ups)",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1792,
+        496
+      ],
+      "webhookId": "4e089f5f-58ea-4c8d-8870-3d155a81f0b7",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aRsCT5IwpLKOT8z2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_4825754198264275735"
+        ]
+      },
+      "id": "af843fb2-c576-4fa5-a7ae-528f64d69df6",
+      "name": "Add Label (Marketing)",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1792,
+        304
+      ],
+      "webhookId": "4e089f5f-58ea-4c8d-8870-3d155a81f0b7",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aRsCT5IwpLKOT8z2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_3077026812229260718"
+        ]
+      },
+      "id": "51ac2c02-6455-490b-9e94-009dfac339fb",
+      "name": "Add Label (Hot Leads)",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1792,
+        112
+      ],
+      "webhookId": "4e089f5f-58ea-4c8d-8870-3d155a81f0b7",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aRsCT5IwpLKOT8z2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_6471892457641034915"
+        ]
+      },
+      "id": "976691c9-69ef-41c5-bb0f-870a44e507f3",
+      "name": "Add Label (Spam/Ignore)",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1792,
+        688
+      ],
+      "webhookId": "4e089f5f-58ea-4c8d-8870-3d155a81f0b7",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aRsCT5IwpLKOT8z2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "id": "ead3ad4f-ec6c-41d0-9246-42cac1a677ef",
+      "name": "Arrange New Emails",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "position": [
+        1216,
+        112
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aRsCT5IwpLKOT8z2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "label:follow-up"
+        },
+        "options": {
+          "downloadAttachments": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        560
+      ],
+      "id": "28e990f9-602e-4d48-a7a6-214cafe83247",
+      "name": "Reply to the Replies",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aRsCT5IwpLKOT8z2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -112
+      ],
+      "id": "8c6978a4-0123-48fe-9751-788b42e3a8bc",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "chatId": "1884283193",
+        "text": "=Text: ⚠️ Workflow Error Alert   \nWorkflow: {{ $json.workflow.name }}   \nError: {{ $json.execution.error.message }}   \nNode: {{ $json.execution.error.node.name }}   \nTime: {{ new Date().toLocaleString('en-US', {timeZone: 'Asia/Manila'}) }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        -112
+      ],
+      "id": "8d9cfa3c-53ef-4c9b-89e7-b26ebfdb38ef",
+      "name": "Send a text message",
+      "webhookId": "e0b3ca05-b33c-468b-8aa3-aa948349bafd",
+      "credentials": {
+        "telegramApi": {
+          "id": "rkW1ytppxgI53GN7",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "content-type": "application/json",
+            "user-agent": "PostmanRuntime/7.45.0",
+            "accept": "*/*",
+            "postman-token": "f4e2ed24-3edf-43a3-a24d-4a22d9a1f6f0",
+            "host": "localhost:5678",
+            "accept-encoding": "gzip, deflate, br",
+            "connection": "keep-alive",
+            "content-length": "220"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "name": "Sarah Buwaya",
+            "email": "stringersesgundo@gmail.com",
+            "message": "I’m looking for an AI automation specialist for our business where it captures new leads i'll be paying a $100 and it's urgent"
+          },
+          "webhookUrl": "http://localhost:5678/webhook-test/new-lead",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the Lead": {
+      "main": [
+        [
+          {
+            "node": "Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "store_lead_in_sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send_thank_you_email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "New Lead Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get the Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send_followup_email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_lead_status": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classification Agent": {
+      "main": [
+        [
+          {
+            "node": "Add Label (New Leads)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Label (Warm Leads)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Label (Hot Leads)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Label (Clients)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Label (Follow Ups)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Label (Marketing)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Label (Spam/Ignore)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Classification Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Arrange New Emails": {
+      "main": [
+        [
+          {
+            "node": "Classification Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to the Replies": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6ef2cad3-afd3-47c7-af79-3137c1ff7f58",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cfd22b916cf429d19a4f0f1d72e4657287c398146e7c0a76ebd4531462d8ff30"
+  },
+  "id": "DEmConP6uYhYl5ZJ",
+  "tags": []
+}
